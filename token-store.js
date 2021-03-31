@@ -5,11 +5,7 @@ module.exports = class TokenStore {
     /** @type mongoose.Model */
     Token;
 
-    _definition = {};
-
     constructor(name, { ...definition } = {}, ttl = 10000) {
-        this._definition = definition;
-
         this.Token = mongoose.model(
             `Token/${name}`,
             new mongoose.Schema({
@@ -34,11 +30,6 @@ module.exports = class TokenStore {
         const _key = Buffer.from(key, "base64url");
         const token = await this.Token.findOneAndDelete({ _key });
 
-        const value = {};
-        for (const name of Object.getOwnPropertyNames(this._definition)) {
-            value[name] = token[name];
-        }
-
-        return value;
+        return token;
     }
 };
