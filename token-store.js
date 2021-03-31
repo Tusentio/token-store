@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 
 module.exports = class TokenStore {
-    /** @type mongoose.Model */
+    /** @type {mongoose.Model} */
     Token;
 
     /**
@@ -38,9 +38,9 @@ module.exports = class TokenStore {
 
     /**
      * @param {string} key
-     * @returns {Promise<mongoose.Document>}
+     * @returns {mongoose.Query}
      */
-    async consume(key) {
+    consume(key) {
         const _key = Buffer.from(key, "base64url");
         const token = await this.Token.findOneAndDelete({ _key });
 
