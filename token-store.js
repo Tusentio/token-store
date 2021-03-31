@@ -42,7 +42,7 @@ module.exports = class TokenStore {
      */
     consume(key) {
         const _key = Buffer.from(key, "base64url");
-        const token = await this.Token.findOneAndDelete({ _key });
+        const token = this.Token.findOneAndDelete({ _key });
 
         return token;
     }
