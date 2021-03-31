@@ -1,0 +1,24 @@
+{
+    "name": "@tusent.io/token-store",
+    "version": "1.0.0",
+    "main": "token-store.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tusentio/token-store.git"
+    },
+    "files": [
+        "token-store.js"
+    ],
+    "author": "Keve1227 <killenlillen02@gmail.com>",
+    "license": "UNLICENSED",
+    "bugs": {
+        "url": "https://github.com/Tusentio/token-store/issues"
+    },
+    "homepage": "https://github.com/Tusentio/token-store#readme",
+    "dependencies": {
+        "mongoose": "^5.12.2"
+    },
+    "devDependencies": {
+        "dotenv": "^8.2.0"
+    }
+}
