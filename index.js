@@ -7,13 +7,17 @@ module.exports = class TokenStore {
 
     /**
      * @param {string} name
-     * @param {mongoose.SchemaDefinition} [param1]
-     * @param {number} [ttl]
+     * @param {mongoose.SchemaDefinition} [definition]
+     * @param {object} [options]
+     * @param {number} [options.ttl]
+     * @param {mongoose.Mongoose} [options.mongoose]
      */
-    constructor(name, { ...definition } = {}, ttl = 10, mongoose = mongoose) {
-        this.Token = mongoose.model(
-            `${name.toLowerCase()}token`,
-            new mongoose.Schema(
+    constructor(name, definition = {}, options = {}) {
+        const { ttl = Infinity, mongoose: m = mongoose } = options;
+
+        this.Token = m.model(
+            `tokens.${name.toLowerCase()}token`,
+            new m.Schema(
                 {
                     value: definition,
                     id: {
