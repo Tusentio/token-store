@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const crypto = require("crypto");
+const uid = require("@tusent.io/uid");
 
 module.exports = class TokenStore {
     /** @type {mongoose.Model} */
@@ -14,12 +14,13 @@ module.exports = class TokenStore {
         this.Token = mongoose.model(
             `Token/${name}`,
             new mongoose.Schema({
-                ...definition,
-                _key: {
-                    type: Buffer,
-                    default: () => crypto.randomBytes(24),
+                value: definition,
+                key: {
+                    type: String,
+                    unique: true,
+                    default: uid.base64Long,
                 },
-                _createdAt: { type: Date, expires: ttl, default: Date.now },
+                createdAt: { type: Date, expires: ttl, default: Date.now },
             })
         );
     }
@@ -30,20 +31,17 @@ module.exports = class TokenStore {
      * @returns {string}
      */
     async create({ ...value }) {
-        const token = await new this.Token(value).save();
-        const key = token._key.toString("base64url");
-
-        return key;
+        const token = await this.Token.create({ value });
+        return token.key;
     }
 
     /**
      * @param {string} key
      * @returns {mongoose.Query}
      */
-    consume(key) {
-        const _key = Buffer.from(key, "base64url");
-        const token = this.Token.findOneAndDelete({ _key });
-
-        return token;
+    async consume(key) {
+        const token = await this.Token.findOne({ key }).lean();
+        await this.Token.findByIdAndDelete(token._id);
+        return token.value;
     }
 };
