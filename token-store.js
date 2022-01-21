@@ -13,15 +13,18 @@ module.exports = class TokenStore {
     constructor(name, { ...definition } = {}, ttl = 10000) {
         this.Token = mongoose.model(
             `Token/${name}`,
-            new mongoose.Schema({
-                value: definition,
-                key: {
-                    type: String,
-                    unique: true,
-                    default: uid.base64Long,
+            new mongoose.Schema(
+                {
+                    value: definition,
+                    key: {
+                        type: String,
+                        unique: true,
+                        default: uid.base64Long,
+                    },
+                    createdAt: { type: Date, expires: ttl, default: Date.now },
                 },
-                createdAt: { type: Date, expires: ttl, default: Date.now },
-            })
+                { minimize: false }
+            )
         );
     }
 
@@ -42,6 +45,6 @@ module.exports = class TokenStore {
     async consume(key) {
         const token = await this.Token.findOne({ key }).lean();
         await this.Token.findByIdAndDelete(token._id);
-        return token.value;
+        return token ? token.value : undefined;
     }
 };
