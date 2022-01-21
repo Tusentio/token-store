@@ -10,18 +10,18 @@ module.exports = class TokenStore {
      * @param {mongoose.SchemaDefinition} [param1]
      * @param {number} [ttl]
      */
-    constructor(name, { ...definition } = {}, ttl = 10000) {
+    constructor(name, { ...definition } = {}, ttl = 10, mongoose = mongoose) {
         this.Token = mongoose.model(
-            `Token/${name}`,
+            `${name.toLowerCase()}token`,
             new mongoose.Schema(
                 {
                     value: definition,
-                    key: {
+                    id: {
                         type: String,
                         unique: true,
                         default: uid.base64Long,
                     },
-                    createdAt: { type: Date, expires: ttl, default: Date.now },
+                    ...(Number.isFinite(ttl) ? { iat: { type: Date, expires: ttl, default: Date.now } } : {}),
                 },
                 { minimize: false }
             )
@@ -29,22 +29,20 @@ module.exports = class TokenStore {
     }
 
     /**
-     *
-     * @param {any} param0
+     * @param {any} value
      * @returns {Promise<string>}
      */
-    async create({ ...value }) {
+    async create(value) {
         const token = await this.Token.create({ value });
-        return token.key;
+        return token.id;
     }
 
     /**
-     * @param {string} key
+     * @param {string} id
      * @returns {mongoose.Query}
      */
-    async consume(key) {
-        const token = await this.Token.findOne({ key }).lean();
-        await this.Token.findByIdAndDelete(token._id);
+    async consume(id) {
+        const token = await this.Token.findOneAndDelete({ id }).lean();
         return token ? token.value : undefined;
     }
 };
