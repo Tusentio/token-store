@@ -28,7 +28,7 @@ module.exports = class TokenStore {
     /**
      *
      * @param {any} param0
-     * @returns {string}
+     * @returns {Promise<string>}
      */
     async create({ ...value }) {
         const token = await this.Token.create({ value });
